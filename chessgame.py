@@ -1,4 +1,4 @@
-#All rights reserved to Damir Golami
+#All rights reserved to Damir & Darien Golami
 
 #Indexing         0      1      2      3     4      5      6     7
 chessboard =  [['[▁▁]','[▆▆]','[▁▁]','[▆▆]','[▁▁]','[▆▆]','[▁▁]','[▆▆]'],# 0, rank 8
