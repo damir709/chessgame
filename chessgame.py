@@ -30,7 +30,7 @@ files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 for i in range(0,4):
     print(('░░' + '██')*4)
     print(('██' + '░░')*4)
-print('\n')
+print('Chess by Damir Golami!', '\n')
 
 #Function to display the chessboard and algebraic notation
 def printBoard():
@@ -64,9 +64,629 @@ def setBoard():
     chessboard[7][5] = '[♗]'
     chessboard[7][6] = '[♘]'
     chessboard[7][7] = '[♖]'
+
+                    
+def checkCpuLegality(cpu_current_square, cpu_dest_square):
+    #For black pieces        
+    legal = False
+
+     #For black pawns
+    if cpu_current_square[0] == '[♟]':
+
+        #Pawns can move 1 space forward, if not blocked
+        if (cpu_current_square[1] - cpu_dest_square[1] == -1) and (cpu_dest_square[0] not in all_pieces) and (cpu_current_square[2] == cpu_dest_square[2]):
+            legal = True
+
+        #Pawns can move 2 spaces forward on their first move, if not blocked
+        elif (cpu_current_square[1] == 1) and (cpu_current_square[1] - cpu_dest_square[1] == -2) and (chessboard[(cpu_current_square[1] + 1)][cpu_dest_square[2]] not in all_pieces) and (chessboard[(cpu_current_square[1] + 2)][cpu_dest_square[2]] not in all_pieces) and (cpu_current_square[2] == cpu_dest_square[2]):
+            legal = True
+
+        #Pawns capture diagonally forward
+        elif (cpu_current_square[1] - cpu_dest_square[1] == -1) and ((cpu_current_square[2] - cpu_dest_square[2] == -1) or (cpu_current_square[2] - cpu_dest_square[2] == 1)) and cpu_dest_square[0] in white_pieces:
+            legal = True
+            
+        #All other pawn moves are illegal
+        else:
+            legal = False
+            
+
+    #For black bishops
+    elif cpu_current_square[0] == '[♝]':
+
+        #Bishops move diagonally, if not blocked
+        #If moving diagonally
+        if abs(cpu_current_square[1] - cpu_dest_square[1]) == abs(cpu_current_square[2] - cpu_dest_square[2]):
+
+            #If moving northeast
+            if (cpu_current_square[1] - cpu_dest_square[1] == 1) and (cpu_current_square[2] - cpu_dest_square[2] == -1):
+                legal = True
+                
+            if (cpu_current_square[1] > cpu_dest_square[1]) and (cpu_current_square[2] < cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] - i][cpu_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                        
+            #If moving northwest
+            if (cpu_current_square[1] - cpu_dest_square[1] == 1) and (cpu_current_square[2] - cpu_dest_square[2] == 1):
+                legal = True
+                
+            if (cpu_current_square[1] > cpu_dest_square[1]) and (cpu_current_square[2] > cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] - i][cpu_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                    
+            #If moving southeast
+            if (cpu_current_square[1] - cpu_dest_square[1] == -1) and (cpu_current_square[2] - cpu_dest_square[2] == -1):
+                legal = True
+                
+            if (cpu_current_square[1] < cpu_dest_square[1]) and (cpu_current_square[2] < cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] + i][cpu_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+
+            #If moving southwest
+            if (cpu_current_square[1] - cpu_dest_square[1] == -1) and (cpu_current_square[2] - cpu_dest_square[2] == 1):
+                legal = True
+                
+            if (cpu_current_square[1] < cpu_dest_square[1]) and (cpu_current_square[2] > cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] + i][cpu_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+
+    #For black knights
+    elif cpu_current_square[0] == '[♞]':
+
+        #Knights move 2 squares horizontally and 1 vertically, or vice versa
+        #Knights can jump over other pieces
+        if (abs(cpu_current_square[1] - cpu_dest_square[1]) + abs(cpu_current_square[2] - cpu_dest_square[2]) == 3) and (cpu_current_square[1] != cpu_dest_square[1]) and (cpu_current_square[2] != cpu_dest_square[2]):
+            legal = True
+
+
+    #For black rooks
+    elif cpu_current_square[0] == '[♜]':
+
+        #Rooks move orthogonally, if not blocked
+        if (cpu_current_square[1] == cpu_dest_square[1]) or (cpu_current_square[2] == cpu_dest_square[2]):
+          
+            #If moving horizontally left
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[1] - cpu_dest_square[1] == 1):
+                legal = True
+                
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[2] > cpu_dest_square[2]):
+                for i in range(1, (abs(cpu_current_square[2] - cpu_dest_square[2]))):
+                    if chessboard[cpu_current_square[1]][cpu_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+                
+            #If moving horizontally right
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[1] - cpu_dest_square[1] == -1):
+                legal = True
+                
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[2] < cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[2] - cpu_dest_square[2])):
+                    if chessboard[cpu_current_square[1]][cpu_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+        
+            #If moving vertically up
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] - cpu_dest_square[1] == 1):
+                legal = True
+            
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] > cpu_dest_square[1]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] - i][cpu_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+
+            #If moving vertically down
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] - cpu_dest_square[1] == -1):
+                legal = True
+                
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] < cpu_dest_square[1]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] + i][cpu_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                       
+                    else:
+                        legal = True
     
+    
+    #For black queen       
+    elif cpu_current_square[0] == '[♛]':
+
+        #Queens move diagonally or orthogonally
+        #If moving diagonally
+        if abs(cpu_current_square[1] - cpu_dest_square[1]) == abs(cpu_current_square[2] - cpu_dest_square[2]):
+
+            #If moving northeast
+            if (cpu_current_square[1] - cpu_dest_square[1] == 1) and (cpu_current_square[2] - cpu_dest_square[2] == -1):
+                legal = True
+                
+            if (cpu_current_square[1] > cpu_dest_square[1]) and (cpu_current_square[2] < cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] - i][cpu_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                        
+            #If moving northwest
+            if (cpu_current_square[1] - cpu_dest_square[1] == 1) and (cpu_current_square[2] - cpu_dest_square[2] == 1):
+                legal = True
+                
+            if (cpu_current_square[1] > cpu_dest_square[1]) and (cpu_current_square[2] > cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] - i][cpu_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                    
+            #If moving southeast
+            if (cpu_current_square[1] - cpu_dest_square[1] == -1) and (cpu_current_square[2] - cpu_dest_square[2] == -1):
+                legal = True
+                
+            if (cpu_current_square[1] < cpu_dest_square[1]) and (cpu_current_square[2] < cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] + i][cpu_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+
+            #If moving southwest
+            if (cpu_current_square[1] - cpu_dest_square[1] == -1) and (cpu_current_square[2] - cpu_dest_square[2] == 1):
+                legal = True
+                
+            if (cpu_current_square[1] < cpu_dest_square[1]) and (cpu_current_square[2] > cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] + i][cpu_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+        #If moving orthogonally
+        elif (cpu_current_square[1] == cpu_dest_square[1]) or (cpu_current_square[2] == cpu_dest_square[2]):
+          
+            #If moving horizontally left
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[1] - cpu_dest_square[1] == 1):
+                legal = True
+                
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[2] > cpu_dest_square[2]):
+                for i in range(1, (abs(cpu_current_square[2] - cpu_dest_square[2]))):
+                    if chessboard[cpu_current_square[1]][cpu_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+                
+            #If moving horizontally right
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[1] - cpu_dest_square[1] == -1):
+                legal = True
+                
+            if (cpu_current_square[1] == cpu_dest_square[1]) and (cpu_current_square[2] < cpu_dest_square[2]):
+                for i in range(1, abs(cpu_current_square[2] - cpu_dest_square[2])):
+                    if chessboard[cpu_current_square[1]][cpu_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+        
+            #If moving vertically up
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] - cpu_dest_square[1] == 1):
+                legal = True
+            
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] > cpu_dest_square[1]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] - i][cpu_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+
+            #If moving vertically down
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] - cpu_dest_square[1] == -1):
+                legal = True
+                
+            if (cpu_current_square[2] == cpu_dest_square[2]) and (cpu_current_square[1] < cpu_dest_square[1]):
+                for i in range(1, abs(cpu_current_square[1] - cpu_dest_square[1])):
+                    if chessboard[cpu_current_square[1] + i][cpu_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                       
+                    else:
+                        legal = True
+            
+
+    #For black king
+    elif cpu_current_square[0] == '[♚]':
+        
+        #If the king tries to move more than 2 squares in any direction
+        if (abs(cpu_current_square[1] - cpu_dest_square[1]) > 1) or (abs(cpu_current_square[2] - cpu_dest_square[2]) > 1):
+            legal = False
+            
+        else:
+            legal = True
+
+    
+    #If the current square is the same as destination
+    if cpu_current_square == cpu_dest_square:
+            legal = False
+
+    #If the destination square is a friendly piece
+    if (cpu_dest_square[0] in black_pieces) and (cpu_current_square[0] in black_pieces):
+            legal = False
+   
+    return legal
+
+def checkPlayerLegality(player_current_square, player_dest_square):
+    
+    #For white pieces        
+    legal = False
+
+     #For white pawns
+    if player_current_square[0] == '[♙]':
+
+        #Pawns can move 1 space forward, if not blocked
+        if (player_current_square[1] - player_dest_square[1] == 1) and (player_dest_square[0] not in all_pieces) and (player_current_square[2] == player_dest_square[2]):
+            legal = True
+
+        #Pawns can move 2 spaces forward on their first move, if not blocked
+        elif (player_current_square[1] == 6) and (player_current_square[1] - player_dest_square[1] == 2) and (chessboard[(player_dest_square[1] - 1)][player_dest_square[2]] not in all_pieces) and (chessboard[(player_dest_square[1] - 2)][player_dest_square[2]] not in all_pieces) and (player_current_square[2] == player_dest_square[2]):
+            legal = True
+
+        #Pawns capture diagonally forward
+        elif (player_current_square[1] - player_dest_square[1] == -1) and ((player_current_square[2] - player_dest_square[2] == -1) or (player_current_square[2] - player_dest_square[2] == 1)) and player_dest_square[0] in black_pieces:
+            legal = True
+            
+        #All other pawn moves are illegal
+        else:
+            legal = False
+            
+
+    #For white bishops
+    elif player_current_square[0] == '[♗]':
+
+        #Bishops move diagonally, if not blocked
+        #If moving diagonally
+        if abs(player_current_square[1] - player_dest_square[1]) == abs(player_current_square[2] - player_dest_square[2]):
+
+            #If moving northeast
+            if (player_current_square[1] - player_dest_square[1] == 1) and (player_current_square[2] - player_dest_square[2] == -1):
+                legal = True
+                
+            if (player_current_square[1] > player_dest_square[1]) and (player_current_square[2] < player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] - i][player_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                        
+            #If moving northwest
+            if (player_current_square[1] - player_dest_square[1] == 1) and (player_current_square[2] - player_dest_square[2] == 1):
+                legal = True
+                
+            if (player_current_square[1] > player_dest_square[1]) and (player_current_square[2] > player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] - i][player_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                    
+            #If moving southeast
+            if (player_current_square[1] - player_dest_square[1] == -1) and (player_current_square[2] - player_dest_square[2] == -1):
+                legal = True
+                
+            if (player_current_square[1] < player_dest_square[1]) and (player_current_square[2] < player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] + i][player_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+
+            #If moving southwest
+            if (player_current_square[1] - player_dest_square[1] == -1) and (player_current_square[2] - player_dest_square[2] == 1):
+                legal = True
+                
+            if (player_current_square[1] < player_dest_square[1]) and (player_current_square[2] > player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] + i][player_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+
+    #For white knights
+    elif player_current_square[0] == '[♘]':
+
+        #Knights move 2 squares horizontally and 1 vertically, or vice versa
+        #Knights can jump over other pieces
+        if (abs(player_current_square[1] - player_dest_square[1]) + abs(player_current_square[2] - player_dest_square[2]) == 3) and (player_current_square[1] != player_dest_square[1]) and (player_current_square[2] != player_dest_square[2]):
+            legal = True
+
+
+    #For white rooks
+    elif player_current_square[0] == '[♖]':
+
+        #Rooks move orthogonally, if not blocked
+        if (player_current_square[1] == player_dest_square[1]) or (player_current_square[2] == player_dest_square[2]):
+          
+            #If moving horizontally left
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[1] - player_dest_square[1] == 1):
+                legal = True
+                
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[2] > player_dest_square[2]):
+                for i in range(1, (abs(player_current_square[2] - player_dest_square[2]))):
+                    if chessboard[player_current_square[1]][player_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+                
+            #If moving horizontally right
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[1] - player_dest_square[1] == -1):
+                legal = True
+                
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[2] < player_dest_square[2]):
+                for i in range(1, abs(player_current_square[2] - player_dest_square[2])):
+                    if chessboard[player_current_square[1]][player_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+        
+            #If moving vertically up
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] - player_dest_square[1] == 1):
+                legal = True
+            
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] > player_dest_square[1]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] - i][player_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+
+            #If moving vertically down
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] - player_dest_square[1] == -1):
+                legal = True
+                
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] < player_dest_square[1]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] + i][player_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                       
+                    else:
+                        legal = True
+    
+    
+    #For white queen       
+    elif player_current_square[0] == '[♕]':
+
+        #Queens move diagonally or orthogonally
+        #If moving diagonally
+        if abs(player_current_square[1] - player_dest_square[1]) == abs(player_current_square[2] - player_dest_square[2]):
+
+            #If moving northeast
+            if (player_current_square[1] - player_dest_square[1] == 1) and (player_current_square[2] - player_dest_square[2] == -1):
+                legal = True
+                
+            if (player_current_square[1] > player_dest_square[1]) and (player_current_square[2] < player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] - i][player_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                        
+            #If moving northwest
+            if (player_current_square[1] - player_dest_square[1] == 1) and (player_current_square[2] - player_dest_square[2] == 1):
+                legal = True
+                
+            if (player_current_square[1] > player_dest_square[1]) and (player_current_square[2] > player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] - i][player_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+                    
+            #If moving southeast
+            if (player_current_square[1] - player_dest_square[1] == -1) and (player_current_square[2] - player_dest_square[2] == -1):
+                legal = True
+                
+            if (player_current_square[1] < player_dest_square[1]) and (player_current_square[2] < player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] + i][player_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+
+            #If moving southwest
+            if (player_current_square[1] - player_dest_square[1] == -1) and (player_current_square[2] - player_dest_square[2] == 1):
+                legal = True
+                
+            if (player_current_square[1] < player_dest_square[1]) and (player_current_square[2] > player_dest_square[2]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] + i][player_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                    else:
+                        legal = True
+
+        #If moving orthogonally
+        elif (player_current_square[1] == player_dest_square[1]) or (player_current_square[2] == player_dest_square[2]):
+          
+            #If moving horizontally left
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[1] - player_dest_square[1] == 1):
+                legal = True
+                
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[2] > player_dest_square[2]):
+                for i in range(1, (abs(player_current_square[2] - player_dest_square[2]))):
+                    if chessboard[player_current_square[1]][player_current_square[2] - i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+                
+            #If moving horizontally right
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[1] - player_dest_square[1] == -1):
+                legal = True
+                
+            if (player_current_square[1] == player_dest_square[1]) and (player_current_square[2] < player_dest_square[2]):
+                for i in range(1, abs(player_current_square[2] - player_dest_square[2])):
+                    if chessboard[player_current_square[1]][player_current_square[2] + i] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+        
+            #If moving vertically up
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] - player_dest_square[1] == 1):
+                legal = True
+            
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] > player_dest_square[1]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] - i][player_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                        
+                    else:
+                        legal = True
+
+            #If moving vertically down
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] - player_dest_square[1] == -1):
+                legal = True
+                
+            if (player_current_square[2] == player_dest_square[2]) and (player_current_square[1] < player_dest_square[1]):
+                for i in range(1, abs(player_current_square[1] - player_dest_square[1])):
+                    if chessboard[player_current_square[1] + i][player_current_square[2]] in all_pieces:
+                        legal = False
+                        break
+                       
+                    else:
+                        legal = True
+            
+
+    #For white king
+    elif player_current_square[0] == '[♔]':
+        
+        #If the king tries to move more than 2 squares in any direction
+        if (abs(player_current_square[1] - player_dest_square[1]) > 1) or (abs(player_current_square[2] - player_dest_square[2]) > 1):
+            legal = False
+            
+        else:
+            legal = True
+
+    
+    #If the current square is the same as destination
+    if player_current_square == player_dest_square:
+            legal = False
+
+    #If the destination square is a friendly piece
+    if (player_dest_square[0] in white_pieces) and (player_current_square[0] in white_pieces):
+            legal = False
+   
+    return legal
+#Function to check number of legal moves for computer
+def checkCpuMoves(chessboard):
+    cpu_legal_moves = []
+    cpu_all_moves = []
+    for x in range(0, 8):
+        for y in range(0, 8):
+            cpu_current_square = (chessboard[x][y], x, y)
+            if cpu_current_square[0] in black_pieces:
+                for k in range(0, 8):
+                    for l in range(0, 8):
+                        cpu_dest_square = (chessboard[k][l], k, l)
+                        cpu_all_moves.append([cpu_current_square, cpu_dest_square])
+                        cpu_move_legal = checkCpuLegality(cpu_current_square, cpu_dest_square)
+                        if cpu_move_legal == True:
+                            cpu_legal_moves.append([cpu_current_square, cpu_dest_square])
+    #print(cpu_legal_moves)
+    #print('Number of legal CPU moves: ', len(cpu_legal_moves))
+    return cpu_legal_moves
+
+#Function to check number of legal moves for player
+def checkPlayerMoves(chessboard):
+    legal_moves = []
+    all_moves = []
+    for x in range(0, 8):
+        for y in range(0, 8):
+            player_current_square = (chessboard[x][y], x, y)
+            if player_current_square[0] in white_pieces:
+                for k in range(0, 8):
+                    for l in range(0, 8):
+                        player_dest_square = (chessboard[k][l], k, l)
+                        all_moves.append([player_current_square, player_dest_square])
+                        player_move_legal = checkPlayerLegality(player_current_square, player_dest_square)
+                        if player_move_legal == True:
+                            legal_moves.append([player_current_square, player_dest_square])
+    #print(legal_moves)
+    #print('Number of legal Player moves: ', len(legal_moves))
+    return legal_moves
+
+def checkAllMoves(chessboard):
+    legal_moves = []
+    cpu_moves = checkCpuMoves(chessboard)
+    player_moves = checkPlayerMoves(chessboard)
+    legal_moves = cpu_moves + legal_moves
+    #print(legal_moves)
+    return legal_moves
+       
 #Function to evaluate the position
-def evaluate():
+def evaluate(chessboard):
+    
     WK = 0
     BK = 0
     WQ = 0
@@ -106,14 +726,84 @@ def evaluate():
                 WP += 1
             elif chessboard[i][j] == '[♟]':
                 BP += 1
-
+                
+   
     material_score = (200 * (WK - BK)) + (9 * (WQ - BQ)) + (5 * (WR - BR)) + (3 * (WB - BB)) + (3 * (WN - BN)) + (1 * (WP - BP))
+    player_moves = checkPlayerMoves(chessboard)
+    cpu_moves = checkCpuMoves(chessboard)
+    mobility_score = (0.1 * (len(player_moves) - len(cpu_moves)))
+    total_score = mobility_score + material_score
+    return round(total_score, 2)
+
     
-    if material_score >= 0:
-        print('Evaluation: +' + str(abs(material_score)), 'for White')
-    else:
-         print('Evaluation: -' + str(abs(material_score)), 'for Black')
+def moveCpuPiece():
+    best_move = []
+    new_chessboard = chessboard
     
+    def alphaBeta(depth, alpha, beta, colour):
+        nonlocal best_move
+        if depth == 0:
+            return evaluate(new_chessboard), best_move
+        if colour == 'Black':
+            best_value = 999
+            value = 999
+            cpu_moves = checkCpuMoves(new_chessboard)
+            for move in cpu_moves:
+                #Make move
+                new_chessboard[move[1][1]][move[1][2]] = move[0][0]
+                new_chessboard[move[0][1]][move[0][2]] = chessboard_original[move[0][1]][move[0][2]]
+                value = min(value, alphaBeta(depth - 1, alpha, beta, 'White')[0])
+                beta = min(beta, value)
+                if value <= alpha:
+                    #Unmake move
+                    new_chessboard[move[1][1]][move[1][2]] = move[1][0]
+                    new_chessboard[move[0][1]][move[0][2]] = move[0][0]
+                    break
+                #print(move, value, depth)
+                if value < best_value:
+                    best_value = value
+                    best_move = move
+                
+                #Unmake move
+                new_chessboard[move[1][1]][move[1][2]] = move[1][0]
+                new_chessboard[move[0][1]][move[0][2]] = move[0][0]
+                
+            return best_value, best_move
+
+        else:
+            best_value = -999
+            value = -999
+            player_moves = checkPlayerMoves(new_chessboard)
+            for move in player_moves:
+                #Make move
+                new_chessboard[move[1][1]][move[1][2]] = move[0][0]
+                new_chessboard[move[0][1]][move[0][2]] = chessboard_original[move[0][1]][move[0][2]]
+                value = max(value, alphaBeta(depth - 1, alpha, beta, 'Black')[0])
+                alpha = max(alpha, value)
+                if value >= beta:
+                    #Unmake move
+                    new_chessboard[move[1][1]][move[1][2]] = move[1][0]
+                    new_chessboard[move[0][1]][move[0][2]] = move[0][0]
+                    break
+                #print(move, value, depth)
+                if value > best_value:
+                    best_value = value
+                    best_move = move
+                    
+                #Unmake move
+                new_chessboard[move[1][1]][move[1][2]] = move[1][0]
+                new_chessboard[move[0][1]][move[0][2]] = move[0][0]
+                
+            #print(move, value, depth)    
+            return best_value, best_move
+        
+      
+    alphaBetaScore = alphaBeta(2, -999, 999, 'Black')
+    print('Computer thinks' , best_move, 'is the best move.')
+    chessboard[best_move[1][1]][best_move[1][2]] = best_move[0][0]
+    chessboard[best_move[0][1]][best_move[0][2]] = chessboard_original[best_move[0][1]][best_move[0][2]]
+    
+        
 #Function to move a piece
 def movePiece():
     
@@ -126,6 +816,10 @@ def movePiece():
     #h7 -> chessboard[1][7]
     #h8 -> chessboard[0][7]
     def chessToIndex(move, original):
+        if (len(move) != 2):
+            print('That is not a valid input!')
+            movePiece()
+            
         file = move[0]
         if file not in files:
             print("That file doesn't exist!")
@@ -158,231 +852,7 @@ def movePiece():
     dest_square_alg = input('Enter the square you want to move to: ')
     dest_square = chessToIndex(dest_square_alg, False)
     print('Destination piece: ', dest_square, '\n')
-    
-    #Nested function to check if moves are legal
-    def checkLegality():
-        
-        legal = False
-        
-        if current_square[0] in black_pieces:
-            legal = True
-            
-        #If the current square is the same as destination
-        if current_square == dest_square:
-            legal = False
-            print("You can't move to the same square you are currently on.")
-            movePiece()
-
-        #If an empty square is selected
-        if (current_square[0] not in black_pieces) and (current_square[0] not in white_pieces):
-            legal = False
-            print("Selected square is empty.")
-            movePiece()
-
-        #If the destination square is a friendly piece
-        if (dest_square[0] in white_pieces) and (current_square[0] in white_pieces):
-            legal = False
-            print("You can't capture your own pieces.")
-            movePiece()
-
-        #Checking if pieces are blocked
-        if current_square[0] != '[♘]':
-
-            #If moving diagonally
-            if abs(current_square[1] - dest_square[1]) == abs(current_square[2] - dest_square[2]):
-
-                #If moving northeast
-                if (current_square[1] > dest_square[1]) and (current_square[2] < dest_square[2]):
-                    for i in range(1, abs(current_square[1] - dest_square[1])):
-                        if chessboard[current_square[1] - i][current_square[2] + i] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved northeast to', dest_square_alg)
-
-                            
-                #If moving northwest
-                if (current_square[1] > dest_square[1]) and (current_square[2] > dest_square[2]):
-                    for i in range(1, abs(current_square[1] - dest_square[1])):
-                        if chessboard[current_square[1] - i][current_square[2] - i] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved northwest to', dest_square_alg)
-
-
-                #If moving southeast
-                if (current_square[1] < dest_square[1]) and (current_square[2] < dest_square[2]):
-                    for i in range(1, abs(current_square[1] - dest_square[1])):
-                        if chessboard[current_square[1] + i][current_square[2] + i] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved southeast to', dest_square_alg)
-
-
-                #If moving southwest
-                if (current_square[1] < dest_square[1]) and (current_square[2] > dest_square[2]):
-                    for i in range(1, abs(current_square[1] - dest_square[1])):
-                        if chessboard[current_square[1] + i][current_square[2] - i] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved southwest to', dest_square_alg)
-
-                        
-            #If moving orthogonally
-            elif (current_square[1] == dest_square[1]) or (current_square[2] == dest_square[2]):
-
-                #If moving horizontally left
-                if (current_square[1] == dest_square[1]) and (current_square[2] > dest_square[2]):
-                    for i in range(1, (abs(current_square[2] - dest_square[2]))):
-                        if chessboard[current_square[1]][current_square[2] - i] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved west to', dest_square_alg)
-                    
-                #If moving horizontally right
-                if (current_square[1] == dest_square[1]) and (current_square[2] < dest_square[2]):
-                    for i in range(1, abs(current_square[2] - dest_square[2])):
-                        if chessboard[current_square[1]][current_square[2] + i] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved east to', dest_square_alg)
-            
-                #If moving vertically up
-                #If index 2 is the same for both, and current square index 1 greater than destination
-                if (current_square[2] == dest_square[2]) and (current_square[1] > dest_square[1]):
-                    for i in range(1, abs(current_square[1] - dest_square[1])):
-                        if chessboard[current_square[1] - i][current_square[2]] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved north to', dest_square_alg)
-            
-
-                #If moving vertically down
-                if (current_square[2] == dest_square[2]) and (current_square[1] < dest_square[1]):
-                    for i in range(1, abs(current_square[1] - dest_square[1])):
-                        if chessboard[current_square[1] + i][current_square[2]] in all_pieces:
-                            print('Illegal move!')
-                            legal = False
-                            printBoard()
-                            movePiece()
-                            
-                        else:
-                            legal = True
-                    print(current_square[0], 'moved south to', dest_square_alg)
-            
-
-        #For white pawns
-        if current_square[0] == '[♙]':
-
-            #Pawns can move 1 space forward, if not blocked
-            if (current_square[1] - dest_square[1] == 1) and (dest_square[0] not in all_pieces) and (current_square[2] == dest_square [2]):
-                legal = True
-
-            #Pawns can move 2 spaces forward on their first move, if not blocked
-            elif (current_square[1] == 6) and (current_square[1] - dest_square[1] == 2) and (chessboard[(dest_square[1] + 1)][dest_square[2]] not in all_pieces):
-                legal = True
-
-            #Pawns capture diagonally forward
-            elif (current_square[1] - dest_square[1] == 1) and ((current_square[2] - dest_square[2] == -1) or (current_square[2] - dest_square[2] == 1)) and (dest_square[0] in black_pieces):
-                legal = True
-                
-            #All other pawn moves are illegal
-            else:
-                legal = False
-                print('Illegal pawn move!')
-                printBoard()
-                movePiece()
-                
-
-        #For white bishops
-        elif current_square[0] == '[♗]':
-
-            #Bishops move diagonally, if not blocked
-            #If absolute value of the difference between the current and destination squares indexes is the same...
-            if abs(current_square[1] - dest_square[1]) == abs(current_square[2] - dest_square[2]):
-                legal = True
-
-        #For white knights
-        elif current_square[0] == '[♘]':
-
-            #Knights move 2 squares horizontally and 1 vertically, or vice versa
-            #Knights can jump over other pieces
-            if (abs(current_square[1] - dest_square[1]) + abs(current_square[2] - dest_square[2]) == 3) and (current_square[1] != dest_square[1]) and (current_square[2] != dest_square[2]):
-                print('Knight jumped to', dest_square_alg)
-                legal = True
-
-
-        #For white rooks
-        elif current_square[0] == '[♖]':
-
-            #Rooks move horizontally or vertically, if not blocked
-            if (current_square[1] == dest_square[1]) or (current_square[2] == dest_square[2]):
-                legal = True
-            
-
-        #For white queen       
-        elif current_square[0] == '[♕]':
-
-            #Queens move diagonally or orthogonally
-            #If moving diagonally
-            if abs(current_square[1] - dest_square[1]) == abs(current_square[2] - dest_square[2]):
-                legal = True
-
-            #If moving orthogonally
-            elif (current_square[1] == dest_square[1]) or (current_square[2] == dest_square[2]):
-                legal = True
-                
-
-        #For white king
-        if current_square[0] == '[♔]':
-            
-            if (abs(current_square[1] - dest_square[1]) > 1) or (abs(current_square[2] - dest_square[2]) > 1):
-                legal = False
-                
-            else:
-                legal = True
-
-        #After all checks if the move being made is not legal
-        if legal == False:
-            print('Illegal move!')
-            printBoard()
-            movePiece()
-
-                
+   
     #Function to promote a pawn that reaches the last rank
     def promotePawn():
         promotion = input('What piece would you like to promote to? Input N, Q, R, or B: ')
@@ -422,7 +892,11 @@ def movePiece():
     
     #Check if the move being made is legal
     #If legal, make the move. Else, prompt to move again
-    checkLegality()
+    player_move_legal = checkPlayerLegality(current_square, dest_square)
+    if player_move_legal == False:
+        print('Illegal move!')
+        printBoard()
+        movePiece()
 
     #For legal moves, change the destination square to the piece on the current square
     chessboard[dest_square[1]][dest_square[2]] = current_square[0]
@@ -433,15 +907,21 @@ def movePiece():
     #If the piece legally moving is a pawn and it makes it to the last rank, promote
     if (dest_square[1] == 0) and (current_square[0] == '[♙]'):
         promotePawn()
-        
-    printBoard()
-    evaluate()
-    movePiece()
 
-
-            
 
 #Initially set the board up, show the board, and prompt to move a piece
-setBoard()
-printBoard()
-movePiece()
+def main():
+    game_over = False
+    setBoard()
+    while game_over == False:
+        evaluation = evaluate(chessboard)
+        if evaluation >= 0:
+            print('Evaluation: +' + str(abs(evaluation)), 'for White')
+        else:
+            print('Evaluation: -' + str(abs(evaluation)), 'for Black')
+        printBoard()
+        movePiece()
+        printBoard()
+        moveCpuPiece()
+    
+main()
