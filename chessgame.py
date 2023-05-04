@@ -1,4 +1,7 @@
-#All rights reserved to Damir & Darien Golami
+#All rights reserved to Damir Golami
+#This is the Python 3 source code for a hobby project of mine where you play a game of chess against a CPU player.
+#Newer version is underway with object-oriented programming.
+
 
 #Indexing         0      1      2      3     4      5      6     7
 chessboard =  [['[▁▁]','[▆▆]','[▁▁]','[▆▆]','[▁▁]','[▆▆]','[▁▁]','[▆▆]'],# 0, rank 8
@@ -65,7 +68,7 @@ def setBoard():
     chessboard[7][6] = '[♘]'
     chessboard[7][7] = '[♖]'
 
-                    
+#Function to check if a CPU's move is legal                    
 def checkCpuLegality(cpu_current_square, cpu_dest_square):
     #For black pieces        
     legal = False
@@ -352,6 +355,7 @@ def checkCpuLegality(cpu_current_square, cpu_dest_square):
    
     return legal
 
+#Function to check if the player's move is legal
 def checkPlayerLegality(player_current_square, player_dest_square):
     
     #For white pieces        
@@ -699,7 +703,8 @@ def evaluate(chessboard):
     BN = 0
     WP = 0
     BP = 0
-    
+
+    #Loop over the board, counting all pieces
     for i in range(0, 8):
         for j in range(0, 8):
             if chessboard[i][j] == '[♔]':
@@ -726,24 +731,32 @@ def evaluate(chessboard):
                 WP += 1
             elif chessboard[i][j] == '[♟]':
                 BP += 1
-                
-   
+
+    #Material score is the sum of the weight of all pieces
     material_score = (200 * (WK - BK)) + (9 * (WQ - BQ)) + (5 * (WR - BR)) + (3 * (WB - BB)) + (3 * (WN - BN)) + (1 * (WP - BP))
     player_moves = checkPlayerMoves(chessboard)
     cpu_moves = checkCpuMoves(chessboard)
+    
+    #Mobility score is the number of legal moves possible
     mobility_score = (0.1 * (len(player_moves) - len(cpu_moves)))
+    
     total_score = mobility_score + material_score
     return round(total_score, 2)
 
-    
+#Function to move the CPU's piece   
 def moveCpuPiece():
     best_move = []
     new_chessboard = chessboard
-    
+
+    #Recursive function to decide the best move
     def alphaBeta(depth, alpha, beta, colour):
         nonlocal best_move
+        
+        #Base case
         if depth == 0:
             return evaluate(new_chessboard), best_move
+
+        #Consider all moves in a given position, pick the best move, then consider all opponent moves for that move
         if colour == 'Black':
             best_value = 999
             value = 999
@@ -755,10 +768,12 @@ def moveCpuPiece():
                 value = min(value, alphaBeta(depth - 1, alpha, beta, 'White')[0])
                 beta = min(beta, value)
                 if value <= alpha:
+                    
                     #Unmake move
                     new_chessboard[move[1][1]][move[1][2]] = move[1][0]
                     new_chessboard[move[0][1]][move[0][2]] = move[0][0]
                     break
+                
                 #print(move, value, depth)
                 if value < best_value:
                     best_value = value
@@ -781,10 +796,12 @@ def moveCpuPiece():
                 value = max(value, alphaBeta(depth - 1, alpha, beta, 'Black')[0])
                 alpha = max(alpha, value)
                 if value >= beta:
+                    
                     #Unmake move
                     new_chessboard[move[1][1]][move[1][2]] = move[1][0]
                     new_chessboard[move[0][1]][move[0][2]] = move[0][0]
                     break
+                
                 #print(move, value, depth)
                 if value > best_value:
                     best_value = value
@@ -797,7 +814,7 @@ def moveCpuPiece():
             #print(move, value, depth)    
             return best_value, best_move
         
-      
+    #Find the best move with a depth of 2 moves  
     alphaBetaScore = alphaBeta(2, -999, 999, 'Black')
     print('Computer thinks' , best_move, 'is the best move.')
     chessboard[best_move[1][1]][best_move[1][2]] = best_move[0][0]
@@ -879,7 +896,7 @@ def movePiece():
 
         #Easter egg, trying to promote to a king brings the Armageddon
         elif promotion.lower() == 'k':
-            print('LO'*999 + 'L', "It's all over for you now boyo!!!!!!!!!!!!!!!!!!!!!!!")
+            print('LO'*999 + 'L')
             chessboard[dest_square[1]][dest_square[2]] = '[♕]'
             chessboard[current_square[1]][current_square[2]] = chessboard_original[current_square[1]][current_square[2]]
             for i in range(0,8):
@@ -913,6 +930,8 @@ def movePiece():
 def main():
     game_over = False
     setBoard()
+    
+    #Run the game until the end
     while game_over == False:
         evaluation = evaluate(chessboard)
         if evaluation >= 0:
