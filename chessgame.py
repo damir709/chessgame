@@ -1,4 +1,4 @@
-#All rights reserved to Damir Golami
+
 #This is the Python 3 source code for a hobby project of mine where you play a game of chess against a CPU player.
 #Newer version is underway with object-oriented programming.
 
